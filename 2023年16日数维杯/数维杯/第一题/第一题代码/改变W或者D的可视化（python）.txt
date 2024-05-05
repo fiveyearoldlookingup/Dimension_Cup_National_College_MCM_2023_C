@@ -1,0 +1,37 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+file_path = 'C:/Users/35274/Desktop/数维杯/第一题/当w一定时a1的值.xlsx'  # 替换为您的文件路径
+
+data = pd.read_excel(file_path, sheet_name=4)  # 假设数据在第四个工作表
+
+# 提取数据
+cleaning_steps = data.iloc[1:, 0].tolist()
+ak_values = data.columns[1:]  # 跳过第一列，提取所有ak值
+selected_ak_values = ak_values[::1]  # 选择每隔5个ak值
+
+# 创建一个空的DataFrame
+df = pd.DataFrame({'Cleaning Step': cleaning_steps})
+
+# 遍历所选的ak值，提取对应的数据
+for ak in selected_ak_values:
+    df[f'Dirt Removed (ak={ak})'] = data[ak].iloc[1:].tolist()
+
+# 绘制图表
+plt.figure(figsize=(10, 6))
+for ak in selected_ak_values:
+    plt.plot(
+        'Cleaning Step', 
+        f'Dirt Removed (ak={ak})', 
+        data=df, 
+        marker='o', 
+        label=f'ak={ak}'
+    )
+
+plt.title('Amount of Dirt Removed for Different D Values')
+plt.xlabel('D Values')
+plt.ylabel('Counts')
+plt.xlim(0, 7)  # 设置x轴范围
+plt.legend()
+plt.grid(True)
+plt.show()

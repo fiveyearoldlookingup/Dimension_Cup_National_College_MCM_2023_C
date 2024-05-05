@@ -1,0 +1,67 @@
+###python
+###(ak-times)Import excel with different ak values ​​obtained in Program 2, and obtain visual images through python
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load data 
+file_path = 'C:/Users/35274/Desktop/数维杯/第一题/Data.xlsx'
+df = pd.read_excel(file_path)
+
+# Extract data
+a1_values = df.iloc[:, 0]  #  first column is the value of a1
+corresponding_values = df.iloc[:, 1]  #  the second column is the corresponding quantity
+
+# Plot complete data
+plt.figure(figsize=(10, 6))
+plt.plot(a1_values, corresponding_values, marker='o', color='blue')
+plt.axvline(x=0.5, color='green', linestyle='--')  # Add a vertical line with a1=0.66667
+# Add text label
+plt.text(0.5, plt.ylim()[1], 'x=0.5', color='green', verticalalignment='top')
+
+plt.title('a1 Values and Corresponding Measures')
+plt.xlabel('a1 Values')
+plt.ylabel('Corresponding Measures')
+plt.grid(True)
+plt.show()
+
+# Make sure the data is sorted by the value of a1
+df.sort_values(by=df.columns[0], inplace=True)
+
+# Extract data
+a1_values = df.iloc[:, 0]  # Assume the first column is the value of a1
+corresponding_values = df.iloc[:, 1]  #Assume that the second column is the corresponding quantity
+
+# Split data
+#a1=0 to 0.5 data
+mask1 = a1_values <= 0.5
+a1_values_0_to_05 = a1_values[mask1]
+corresponding_values_0_to_05 = corresponding_values[mask1]
+
+# Data after a1=0.5
+mask2 = a1_values > 0.5
+a1_values_after_05 = a1_values[mask2]
+corresponding_values_after_05 = corresponding_values[mask2]
+
+# Plot the data for a1=0 to 0.5
+plt.figure(figsize=(10, 6))
+plt.plot(a1_values_0_to_05, corresponding_values_0_to_05, marker='o', color='blue')
+plt.title('a1 Values from 0 to 0.5 and Corresponding Measures')
+plt.xlabel('a1 Values')
+plt.ylabel('Corresponding Measures')
+plt.grid(True)
+plt.show()
+
+# Plot the data after a1=0.5
+plt.figure(figsize=(10, 6))
+plt.plot(a1_values_after_05, corresponding_values_after_05, marker='o', color='red')
+plt.axvline(x=0.67, color='green', linestyle='--')  # add a1=0.66667 
+# Add text label
+plt.text(0.67, plt.ylim()[1], 'x=0.66667', color='green', verticalalignment='top')
+
+
+plt.title('a1 Values after 0.5 and Corresponding Measures')
+plt.xlabel('a1 Values')
+plt.ylabel('Corresponding Measures')
+plt.grid(True)
+plt.show()

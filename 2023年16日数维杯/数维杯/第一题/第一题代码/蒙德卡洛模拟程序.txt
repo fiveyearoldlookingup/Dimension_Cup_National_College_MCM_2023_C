@@ -1,0 +1,66 @@
+function [bestStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1)
+    % 参数初始化
+    maxCleans = W / 50;
+   
+
+    numParts = length(D_parts);
+    cleansUsed = 0;
+    Dk = D_parts;
+    bestStrategy = zeros(1, maxCleans);
+    cleanedAmounts = zeros(1, maxCleans); % 存储每次清洗去除的污垢量
+    cleansCount = zeros(1, numParts); % 存储每部分的清洗次数
+
+    % 在水资源限制下模拟不同的清洗策略
+    while cleansUsed < maxCleans
+        maxClean = 0;
+        selectedPart = 0;
+
+        % 选择去除最多污垢的部分进行清洗
+        for i = 1:numParts
+            if Dk(i) > 0
+                cleanPower = X;
+                if i == numParts  % 对于最后一部分，使用实际污垢量
+                    cleanPower = D_parts(i);
+                end
+                potentialClean = cleanPower * a1 * 0.5^cleansCount(i); % 计算可能去除的污垢量
+                currentClean = min(Dk(i), potentialClean); % 确保不超过剩余污垢量
+                if currentClean > maxClean
+                    maxClean = currentClean;
+                  
+                    selectedPart = i;
+                end
+            end
+        end
+
+        % 如果没有可清洗的部分，终止循环
+        if selectedPart == 0
+            break;
+        end
+
+        % 更新清洗策略、污垢量和清洗去除的污垢量
+        bestStrategy(cleansUsed + 1) = selectedPart;
+        cleanedAmounts(cleansUsed + 1) = maxClean;
+        Dk(selectedPart) = Dk(selectedPart) - maxClean;
+        cleansCount(selectedPart) = cleansCount(selectedPart) + 1;
+        cleansUsed = cleansUsed + 1;
+    end
+end
+
+% 参数设置
+D_parts = 10; % 污垢分为三部分：10, 10, 1
+X = 1000; % 洗涤剂量
+W = 500; % 水的可用量
+W= fix(W/50) * 50;
+a1 = 0.8; % 清洁效率因子
+
+% 寻找最优清洗策略
+[optimalStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1);
+
+% 输出结果
+%disp('Optimal Cleaning Strategy (Part Chosen per Step):');
+%disp(optimalStrategy);
+disp('Cleaned Amounts per Step:');
+disp(cleanedAmounts);
+nonZeroCount = nnz(cleanedAmounts);
+disp('Number of non-zero cleaned amounts:');
+disp(nonZeroCount);

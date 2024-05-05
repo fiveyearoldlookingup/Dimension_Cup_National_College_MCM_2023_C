@@ -1,0 +1,69 @@
+%%%%matlab
+%%%%Applying Monte Carlo simulation to solve integer nonlinear programming models
+function [bestStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1)
+    % Parameter initialization
+    maxCleans = W / 50;
+   
+
+    numParts = length(D_parts);
+    cleansUsed = 0;
+    Dk = D_parts;
+    bestStrategy = zeros(1, maxCleans);
+    cleanedAmounts = zeros(1, maxCleans); % Stores the amount of dirt removed by each cleaning
+    cleansCount = zeros(1, numParts); % Store the number of washes for each part
+
+    % Simulating different cleaning strategies under water constraints
+    while cleansUsed < maxCleans
+        maxClean = 0;
+        selectedPart = 0;
+
+        % Select the part to clean that removes the most dirt
+        for i = 1:numParts
+            if Dk(i) > 0
+                cleanPower = X;
+                if i == numParts  %For the last part, use the actual amount of dirt
+                    cleanPower = D_parts(i);
+                end
+                potentialClean = cleanPower * a1 * 0.5^cleansCount(i); % Calculate the amount of dirt that may be removed
+                currentClean = min(Dk(i), potentialClean); % Make sure the amount of remaining dirt is not exceeded
+                if currentClean > maxClean
+                    maxClean = currentClean;
+                  
+                    selectedPart = i;
+                end
+            end
+        end
+
+        % If there are no parts to clean, terminate the cycle
+        if selectedPart == 0
+            break;
+        end
+
+        % Update cleaning strategy, dirt volume and dirt removal volume
+        bestStrategy(cleansUsed + 1) = selectedPart;
+        cleanedAmounts(cleansUsed + 1) = maxClean;
+        Dk(selectedPart) = Dk(selectedPart) - maxClean;
+        cleansCount(selectedPart) = cleansCount(selectedPart) + 1;
+        cleansUsed = cleansUsed + 1;
+    end
+end
+
+%%%%%%%%%dividing line%%%%%%%%%
+% parameter settings
+D_parts = 10; % initial dirt amount
+X = 1000; % Detergent amount
+W = 500; % Amount of water available
+W= fix(W/50) * 50;
+a1 = 0.8; % cleaning efficiency factor
+
+% Find the optimal cleaning strategy
+[optimalStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1);
+
+% Output results
+%disp('Optimal Cleaning Strategy (Part Chosen per Step):');
+%disp(optimalStrategy);
+disp('Cleaned Amounts per Step:');
+disp(cleanedAmounts);
+nonZeroCount = nnz(cleanedAmounts);
+disp('Number of non-zero cleaned amounts:');
+disp(nonZeroCount);

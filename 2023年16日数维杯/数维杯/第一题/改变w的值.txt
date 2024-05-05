@@ -1,0 +1,37 @@
+% 参数设置
+D_parts = 10; % 污垢分为三部分：10, 10, 1
+X = 1000; % 洗涤剂量
+a1 = 0.8; % 清洁效率因子
+
+% 初始化变量
+W_values = 0:10:1000; 
+nonZeroCounts = zeros(size(W_values)); % 用于存储每个 W 值对应的 nonZeroCount
+
+% 循环遍历不同的 W 值
+for i = 1:length(W_values)
+    W = W_values(i);
+    W = fix(W/50) * 50;
+
+    % 寻找最优清洗策略
+    [optimalStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1);
+
+    % 计算非零清洁量的个数
+    nonZeroCounts(i) = nnz(cleanedAmounts);
+end
+
+% 可视化
+plot(W_values, nonZeroCounts, 'b-o'); % 绘制折线图
+hold on; % 保持当前图表，以便添加更多图层
+
+% 标记 W = 50 和 W = 100 的位置
+w50_index = find(W_values == 50);
+w100_index = find(W_values == 100);
+plot(W_values(w50_index), nonZeroCounts(w50_index), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r');
+plot(W_values(w100_index), nonZeroCounts(w100_index), 'go', 'MarkerSize', 10, 'MarkerFaceColor', 'g');
+
+xlabel('Water Volume (W)');
+ylabel('Number of  Cleaned Amounts');
+title(' Cleaned Amounts vs Water Volume');
+grid on;
+legend('Counts', 'W = 50', 'W = 100');
+hold off; % 结束图层添加

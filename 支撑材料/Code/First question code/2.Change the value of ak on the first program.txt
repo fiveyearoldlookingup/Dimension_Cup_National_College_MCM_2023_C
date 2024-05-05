@@ -1,0 +1,36 @@
+%%%matlab
+%%%Change the value of ak based on Monte Carlo
+
+% parameter settings
+D_parts = 10; % initial dirt amount
+X = 1000; % Detergent amount
+W = 1100*50; % Amount of water available
+W = fix(W/50) * 50; % Ensure that W is a multiple of 50
+a1_values = 0:0.01:1; % Assume that a1 ranges from 0 to 1 with a step size of 0.1
+
+% Initialize variables
+nonZeroCounts = zeros(size(a1_values)); % Used to store the nonZeroCount corresponding to each a1 value
+cleanedAmountsMatrix = []; % Used to store Cleaned Amounts per Step under each a1 value
+
+% Loop through different a1 values
+for i = 1:length(a1_values)
+    a1 = a1_values(i);
+
+    % Find the optimal cleaning strategy
+    [optimalStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1);
+
+    % Calculate the number of non-zero cleaning quantities and store the results
+    nonZeroCounts(i) = nnz(cleanedAmounts);
+    cleanedAmountsMatrix = [cleanedAmountsMatrix; cleanedAmounts]; % Add the results to the matrix
+end
+
+% Output table with non-zero degree
+nonZeroCountsTable = table(a1_values', nonZeroCounts', 'VariableNames', {'a1', 'NonZeroCounts'});
+disp('Table of Non-Zero Counts for Different a1 Values:');
+disp(nonZeroCountsTable);
+
+% Output the results of Cleaned Amounts per Step
+disp('Cleaned Amounts per Step for Different a1 Values:');
+for i = 1:length(a1_values)
+    disp(['a1 = ', num2str(a1_values(i)), ':']);
+    disp(cleanedAmountsMatrix(i, :));

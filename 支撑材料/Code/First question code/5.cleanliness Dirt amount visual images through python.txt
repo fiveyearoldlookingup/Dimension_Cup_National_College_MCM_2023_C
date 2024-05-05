@@ -1,0 +1,39 @@
+###python
+###(cleanliness,Dirt amount)Import excel with different ak values ​​obtained in Program 2 and Program 3, and obtain visual images through python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+file_path = 'C:/Users/35274/Desktop/数维杯/第一题/Data.xlsx'
+
+data = pd.read_excel(file_path, sheet_name=4)  # Change the requirements worksheet according to the desired requirements
+
+# Extract data
+cleaning_steps = data.iloc[1:, 0].tolist()
+ak_values = data.columns[1:]  # Skip the first column and extract all ak values
+selected_ak_values = ak_values[::1]  # Every few ak values ​​can be selected upon request
+
+# Create an empty DataFrame
+df = pd.DataFrame({'Cleaning Step': cleaning_steps})
+
+# Traverse the selected ak value and extract the corresponding data
+for ak in selected_ak_values:
+    df[f'Dirt Removed (ak={ak})'] = data[ak].iloc[1:].tolist()
+
+# Draw a graph
+plt.figure(figsize=(10, 6))
+for ak in selected_ak_values:
+    plt.plot(
+        'Cleaning Step', 
+        f'Dirt Removed (ak={ak})', 
+        data=df, 
+        marker='o', 
+        label=f'ak={ak}'
+    )
+
+plt.title('Amount of Dirt Removed for Different D Values') #Change the title according to the desired requirements
+plt.xlabel('D Values')  #Change the name of the x-axis according to your desired requirements
+plt.ylabel('Counts')  #Change the name of the y-axis according to your desired requirements
+plt.xlim(0, 7)  # Set x-axis range
+plt.legend()
+plt.grid(True)
+plt.show()

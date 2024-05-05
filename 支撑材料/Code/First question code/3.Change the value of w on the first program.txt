@@ -1,0 +1,40 @@
+%%%matlab
+%%%Change the value of w based on Monte Carlo
+
+% parameter settings
+D_parts = 10; % initial dirt amount
+X = 1000; % Detergent amount
+a1 = 0.8; % cleaning efficiency factor
+
+% Initialize variables
+W_values = 0:10:1000; 
+nonZeroCounts = zeros(size(W_values)); % Used to store the nonZeroCount corresponding to each W value
+
+% Loop through different W values
+for i = 1:length(W_values)
+    W = W_values(i);
+    W = fix(W/50) * 50;
+
+    % Find the optimal cleaning strategy
+    [optimalStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1);
+
+    % Calculate the number of non-zero cleaning quantities
+    nonZeroCounts(i) = nnz(cleanedAmounts);
+end
+
+% Visualization
+plot(W_values, nonZeroCounts, 'b-o'); % Draw a line chart
+hold on; % Keep the current diagram so you can add more layers
+
+% Mark the locations W = 50 and W = 100
+w50_index = find(W_values == 50);
+w100_index = find(W_values == 100);
+plot(W_values(w50_index), nonZeroCounts(w50_index), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r');
+plot(W_values(w100_index), nonZeroCounts(w100_index), 'go', 'MarkerSize', 10, 'MarkerFaceColor', 'g');
+
+xlabel('Water Volume (W)');
+ylabel('Number of  Cleaned Amounts');
+title(' Cleaned Amounts vs Water Volume');
+grid on;
+legend('Counts', 'W = 50', 'W = 100');
+hold off; % End layer addition

@@ -1,0 +1,33 @@
+% 参数设置
+D_parts = 10; % 
+X = 1000; % 洗涤剂量
+W = 1100*50; % 水的可用量
+W = fix(W/50) * 50; % 保证 W 是 50 的倍数
+a1_values = 0:0.01:1; % 假设 a1 的取值范围从 0 到 1，步长为 0.1
+
+% 初始化变量
+nonZeroCounts = zeros(size(a1_values)); % 用于存储每个 a1 值对应的 nonZeroCount
+cleanedAmountsMatrix = []; % 用于存储每个 a1 值下的 Cleaned Amounts per Step
+
+% 循环遍历不同的 a1 值
+for i = 1:length(a1_values)
+    a1 = a1_values(i);
+
+    % 寻找最优清洗策略
+    [optimalStrategy, cleanedAmounts] = findOptimalCleaningStrategy(D_parts, X, W, a1);
+
+    % 计算非零清洁量的个数并存储结果
+    nonZeroCounts(i) = nnz(cleanedAmounts);
+    cleanedAmountsMatrix = [cleanedAmountsMatrix; cleanedAmounts]; % 将结果添加到矩阵中
+end
+
+% 输出非零次数的表格
+nonZeroCountsTable = table(a1_values', nonZeroCounts', 'VariableNames', {'a1', 'NonZeroCounts'});
+disp('Table of Non-Zero Counts for Different a1 Values:');
+disp(nonZeroCountsTable);
+
+% 输出 Cleaned Amounts per Step 的结果
+disp('Cleaned Amounts per Step for Different a1 Values:');
+for i = 1:length(a1_values)
+    disp(['a1 = ', num2str(a1_values(i)), ':']);
+    disp(cleanedAmountsMatrix(i, :));
